@@ -1,0 +1,38 @@
+@CHARSET "UTF-8";
+
+.calPanl {
+	width: 275px;
+	border: red solid 0px;
+}
+
+.showPanl {
+	width: 236px;
+	float: left;
+	border: green solid 1px;
+}
+
+.leftPanl {
+	border: tan solid 1px;
+	width: 140px;
+	float: left;
+}
+
+.operPanl {
+	width: 94px;
+	float: left;
+	border: brown solid 1px;
+}
+
+.showPanl input {
+	width: 230px;
+	height: 40px;
+	font-size: 25px;
+	text-align: right;
+}
+
+button {
+	margin: 1px 1px 1px 0px;
+	padding: 1px 1px 1px 1px;
+	float: left;
+	width: 45px;
+}
