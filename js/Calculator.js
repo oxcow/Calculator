@@ -55,7 +55,7 @@ function bindClickEventToNumPanlBtns() {
 }
 // 绑定click事件到操作面板按钮
 function bindClickEventToOperPanlBtns() {
-	bindEventToButton("operPanl", "click", [ oneSubX, sqrtUnary, null, null,
+	bindEventToButton("operPanl", "click", [ oneSubX, sqrtX, null, null,
 			null, oneDivX ]);
 }
 var Calculator = {
@@ -130,7 +130,7 @@ function oneSubX() {
 	Calculator.eraseData().setData(0 - val).showData("showval");
 }
 // sqrt(x)
-function sqrtUnary() {
+function sqrtX() {
 	var val = Number(Calculator.getDatas());
 	if (val < 0) {
 		console.log("Math.sqrt(" + val + ")输入非法");
