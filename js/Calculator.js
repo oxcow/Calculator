@@ -1,97 +1,23 @@
-var num_array = {
-	one : '0',
-	oper : null
-};
 $(function() {
 	// 控制按钮
 	renderingCtrlPanl();
 	// 控制按钮绑定事件
 	bindClickEventToCtrlPanlBtns();
-
 	// 数字按钮
 	renderingNumPanl();
 	// 数字按钮绑定事件
-	$.each($(".numPanl > button"), function(idx, val) {
-		if (idx == 9) {
-			$(val).css('width', '90px');
-		}
-		$(val).bind("click", function() {
-			var showval = $("#showval").val();
-			var clicknum = $(val).text();
-			if (num_array.oper) {
-				showval = 0;
-				$("#showval").val(showval);
-			}
-			// console.log("num_array2", num_array);
-			if (showval && showval != '0') {
-				$("#showval").val(showval + clicknum);
-			} else {
-				$("#showval").val(clicknum);
-			}
-		});
-	});
-	// bindClickEventToNumPanlBtns();
+	bindClickEventToNumPanlBtns();
 	// 操作按钮
 	renderingOperPanl();
-
 	// 操作绑定事件
-	$.each($(".operPanl > button"), function(idx, val) {
-		if (idx == 8) {
-			$(val).css("width", "90px");
-		}
-		$(val).bind("click", function() {
-			switch (idx) {
-			case 0:
-				var cur_val = $("#showval").val();
-				var fval = cur_val.substring(0, 1);
-				if (fval != '0') {
-					if (fval == '-') {
-						$("#inputVal").val(cur_val.slice(1, cur_val.length));
-					} else {
-						$("#inputVal").val("-" + cur_val);
-					}
-				}
-				break;
-			case 1:
-				var cur_val = parseFloat($("#showval").val());
-				$("#showval").val(Math.sqrt(cur_val));
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 5:// 分数,单目运算
-				var cur_val = parseFloat($("#showval").val());
-				$("#showval").val(1 / cur_val);
-				break;
-			case 6:// 减号
-				num_array.oper = "-";
-				num_array = jsval(num_array);
-				break;
-			case 7: // 加号
-				num_array.oper = "+";
-				num_array = jsval(num_array);
-				break;
-			case 8: // 等号
-				var one = parseFloat($("#showval").data("showval").one);
-				var two = parseFloat($("#showval").val());
-				console.log(one + " + " + two + " = ", one + two);
-				$('#showval').val(one + two);
-				$("#showval").data("showval", {
-					one : '0'
-				});
-				break;
-			}
-		});
-
-	});
+	bindClickEventToOperPanlBtns();
 });
+
 function addButton(aBtnNames, targetDivClass) {
 	var sBtn = "";
 	$.each(aBtnNames, function(idx, val) {
-		sBtn += "<button>" + val + "</button>";
+		sBtn += "<button id='" + targetDivClass + "c_btn_" + idx + "'>" + val
+				+ "</button>";
 	});
 	$("." + targetDivClass).append(sBtn);
 }
@@ -127,43 +53,99 @@ function bindClickEventToCtrlPanlBtns() {
 function bindClickEventToNumPanlBtns() {
 	bindEventToButton("numPanl", "click", inputNum);
 }
+// 绑定click事件到操作面板按钮
+function bindClickEventToOperPanlBtns() {
+	bindEventToButton("operPanl", "click", [ oneSubX, sqrtUnary, null, null,
+			null, oneDivX ]);
+}
+var Calculator = {
+	__data : [],
+	__isDecimalPoint : function(val) { // 判断是否为小数点
+		return val == "." ? true : false;
+	},
+	__dealWithdecimalPoint : function() {
+		if (this.getDataLen() == 0) {
+			this.__data.push(0);
+		}
+		if (this.__data.toString().indexOf(".") == -1) {
+			this.__data.push(".");
+		}
+	},
+	getDataLen : function() {
+		return this.__data.length;
+	},
+	pushData : function(val) {// 将输入的数据存放到计算器的数据里
+		if (this.__isDecimalPoint(val)) {
+			this.__dealWithdecimalPoint();
+		} else {
+			if (this.getDataLen() == 1 && this.__data[0] == "0") {
+				if (val != '0') {
+					this.__data[0] = val;
+				}
+			} else {
+				this.__data.push(val);
+			}
+		}
+		return this;
+	},
+	popData : function() {// 删除计算器的最后一位数据并返回
+		this.getDataLen() > 0 ? this.__data.pop() : null;
+		return this;
+	},
+	eraseData : function() {
+		this.__data = [];
+		return this;
+	},
+	setData : function(aData) {
+		if ($.isArray(aData)) {
+			this.__data = aData;
+		} else {
+			this.__data = String(aData).split("");
+		}
+		return this;
+	},
+	getDatas : function() {
+		return this.getDataLen() > 0 ? this.__data.join("") : "0";
+	},
+	showData : function(positionId) {
+		$("#" + positionId).val(this.getDatas());
+	}
+};
 
+// ctrlPanl-回退输入事件
 function rollBackInput() {
-	var inputval = $("#showval").val();
-	var inputval_len = inputval.length;
-	if (inputval_len <= 1) {
-		$("#showval").val("0");
-	} else {
-		$("#showval").val(inputval.slice(0, inputval.length - 1));
-	}
+	Calculator.popData().showData("showval");
 }
+// ctrlPanl-清空输入事件
 function clearInput() {
-	$("#showval").val("0");
+	Calculator.eraseData().showData("showval");
 }
+// numPanl-输入事件
 function inputNum() {
-	var showval = $("#showval").val();
-	var clicknum = $(val).text();
-	if (num_array.oper) {
-		showval = 0;
-		$("#showval").val(showval);
-	}
-	if (showval && showval != '0') {
-		$("#showval").val(showval + clicknum);
+	Calculator.pushData($(this).text()).showData("showval");
+}
+// 0-x
+function oneSubX() {
+	var val = Number(Calculator.getDatas());
+	Calculator.eraseData().setData(0 - val).showData("showval");
+}
+// sqrt(x)
+function sqrtUnary() {
+	var val = Number(Calculator.getDatas());
+	if (val < 0) {
+		console.log("Math.sqrt(" + val + ")输入非法");
+		return false;
 	} else {
-		$("#showval").val(clicknum);
+		Calculator.eraseData().setData(Math.sqrt(val)).showData("showval");
 	}
 }
-
-function jsval(numarray) {
-	var showval = $("#showval").val();
-	var express = numarray.one + numarray.oper + showval;
-	console.log("express->", express);
-	var result = eval(express);
-	console.log("result->", result);
-	$("#showval").val(result);
-	numarray.one = result;
-	return numarray;
-}
-function test() {
-
+// 1/x
+function oneDivX() {
+	var val = Number(Calculator.getDatas());
+	if (val == 0) {
+		console.log("0 不能做除数");
+		return false;
+	} else {
+		Calculator.eraseData().setData(1 / val).showData("showval");
+	}
 }

@@ -24,10 +24,15 @@
 }
 
 .showPanl input {
-	width: 230px;
+	width: 233px;
 	height: 40px;
 	font-size: 25px;
 	text-align: right;
+	font-size: 25px;
+}
+
+#numPanlc_btn_10,#operPanlc_btn_8 {
+	width: 91px;
 }
 
 button {
