@@ -32,7 +32,8 @@ function renderingNumPanl() {
 }
 // 渲染操作按钮
 function renderingOperPanl() {
-	addButton([ '±', '√', '÷', '%', '×', '1/x', '-', '+', '=' ], "operPanl");
+	// addButton([ '±', '√', '÷', '%', '×', '1/x', '-', '+', '=' ], "operPanl");
+	addButton([ '±', '√', '/', '%', '*', '1/x', '-', '+', '=' ], "operPanl");
 }
 // 绑定事件到目标按钮
 function bindEventToButton(targetBtnDivClass, eventName, aEventFns) {
@@ -55,8 +56,9 @@ function bindClickEventToNumPanlBtns() {
 }
 // 绑定click事件到操作面板按钮
 function bindClickEventToOperPanlBtns() {
-	bindEventToButton("operPanl", "click", [ oneSubX, sqrtX, null, null,
-			null, oneDivX ]);
+	bindEventToButton("operPanl", "click", [ oneSubX, sqrtX,
+			fourArithmeticOper, null, fourArithmeticOper, oneDivX,
+			fourArithmeticOper, fourArithmeticOper, eq ]);
 }
 var Calculator = {
 	__data : [],
@@ -119,6 +121,7 @@ function rollBackInput() {
 // ctrlPanl-清空输入事件
 function clearInput() {
 	Calculator.eraseData().showData("showval");
+	BinaryOperation.init(0, null);
 }
 // numPanl-输入事件
 function inputNum() {
@@ -127,7 +130,7 @@ function inputNum() {
 // 0-x
 function oneSubX() {
 	var val = Number(Calculator.getDatas());
-	Calculator.eraseData().setData(0 - val).showData("showval");
+	Calculator.setData(0 - val).showData("showval");
 }
 // sqrt(x)
 function sqrtX() {
@@ -136,7 +139,7 @@ function sqrtX() {
 		console.log("Math.sqrt(" + val + ")输入非法");
 		return false;
 	} else {
-		Calculator.eraseData().setData(Math.sqrt(val)).showData("showval");
+		Calculator.setData(Math.sqrt(val)).showData("showval");
 	}
 }
 // 1/x
@@ -146,6 +149,56 @@ function oneDivX() {
 		console.log("0 不能做除数");
 		return false;
 	} else {
-		Calculator.eraseData().setData(1 / val).showData("showval");
+		Calculator.setData(1 / val).showData("showval");
 	}
+}
+
+var BinaryOperation = {
+	__x : 0,
+	__oper : null,
+	init : function(x, oper) {
+		this.__x = x;
+		this.__oper = oper;
+	},
+	getOper : function() {
+		return this.__oper;
+	},
+	isCalculated : function() {
+		return this.__oper ? true : false;
+	},
+	result : function(y, oper) {
+		// TODO 需要解决 x*y-z的情况
+		oper ? this.__oper = oper : null;
+		console.log("y-->", y);
+		if (this.isCalculated() && y) {
+			console.log("(" + this.__x + ")" + this.__oper + "(" + y + ")");
+			var res = eval("(" + this.__x + ")" + this.__oper + "(" + y + ")");
+			this.__x = res;
+			console.log(this);
+			return res;
+		} else {
+			return this.__x;
+		}
+	}
+};
+
+// x+y x-y x*y x/y Four Arithmetic Operations
+function fourArithmeticOper() {
+	var oper = $(this).text();
+	var inputVal = Number(Calculator.getDatas());
+	if (!BinaryOperation.getOper()) {
+		BinaryOperation.init(inputVal, oper);
+	} else {
+		var result = BinaryOperation.result(inputVal, oper);
+		Calculator.setData(result).showData("showval");
+	}
+	Calculator.eraseData();
+}
+// =
+function eq() {
+	var result = BinaryOperation.result(Number(Calculator.getDatas()), null);
+	Calculator.setData(result).showData("showval");
+	// Calculator.eraseData();
+	BinaryOperation.init(0, null);
+	// TODO 需要处理重复点击=的问题。目前是点击一下可以，当再次点击时清零
 }
