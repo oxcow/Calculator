@@ -32,7 +32,6 @@ function renderingNumPanl() {
 }
 // 渲染操作按钮
 function renderingOperPanl() {
-	// addButton([ '±', '√', '÷', '%', '×', '1/x', '-', '+', '=' ], "operPanl");
 	addButton([ '±', '√', '/', '%', '*', '1/x', '-', '+', '=' ], "operPanl");
 }
 // 绑定事件到目标按钮
@@ -163,22 +162,22 @@ var BinaryOperation = {
 	getOper : function() {
 		return this.__oper;
 	},
-	isCalculated : function() {
-		return this.__oper ? true : false;
-	},
 	result : function(y, oper) {
-		// TODO 需要解决 x*y-z的情况
-		oper ? this.__oper = oper : null;
-		console.log("y-->", y);
-		if (this.isCalculated() && y) {
-			console.log("(" + this.__x + ")" + this.__oper + "(" + y + ")");
-			var res = eval("(" + this.__x + ")" + this.__oper + "(" + y + ")");
-			this.__x = res;
-			console.log(this);
-			return res;
+		if (this.__oper) {
+			// TODO 需要解决用户输入为0的情况
+			if (y) {
+				var res = eval("(" + this.__x + ")" + this.__oper + "(" + y
+						+ ")");
+				console.log("(" + this.__x + ")" + this.__oper + "(" + y + ")",
+						"=" + res);
+				this.__x = res;
+			}
+			this.__oper = oper;
 		} else {
-			return this.__x;
+			console.log(" x !o ");
+			this.__x = y;
 		}
+		return this.__x;
 	}
 };
 
@@ -193,12 +192,10 @@ function fourArithmeticOper() {
 		Calculator.setData(result).showData("showval");
 	}
 	Calculator.eraseData();
+	// TODO 由于四则运算后清空了Calculator的数据，导致此时在进行一元运算时无法获取数据
 }
 // =
 function eq() {
 	var result = BinaryOperation.result(Number(Calculator.getDatas()), null);
 	Calculator.setData(result).showData("showval");
-	// Calculator.eraseData();
-	BinaryOperation.init(0, null);
-	// TODO 需要处理重复点击=的问题。目前是点击一下可以，当再次点击时清零
 }
