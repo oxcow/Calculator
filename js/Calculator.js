@@ -90,7 +90,13 @@ var Calculator = {
 		return this;
 	},
 	popData : function() {// 删除计算器的最后一位数据并返回
-		this.getDataLen() > 0 ? this.__data.pop() : null;
+		if (this.getDataLen() != 0) {
+			if (this.__data[0] == '-' && this.getDataLen() == 2) {
+				this.__data = [];
+			} else {
+				this.__data.pop();
+			}
+		}
 		return this;
 	},
 	eraseData : function() {
@@ -106,10 +112,10 @@ var Calculator = {
 		return this;
 	},
 	getDatas : function() {
-		return this.getDataLen() > 0 ? this.__data.join("") : "0";
+		return this.getDataLen() > 0 ? this.__data.join("") : null;
 	},
 	showData : function(positionId) {
-		$("#" + positionId).val(this.getDatas());
+		$("#" + positionId).val(this.getDatas() || '0');
 	}
 };
 
@@ -164,7 +170,6 @@ var BinaryOperation = {
 	},
 	result : function(y, oper) {
 		if (this.__oper) {
-			// TODO 需要解决用户输入为0的情况
 			if (y) {
 				var res = eval("(" + this.__x + ")" + this.__oper + "(" + y
 						+ ")");
@@ -174,8 +179,7 @@ var BinaryOperation = {
 			}
 			this.__oper = oper;
 		} else {
-			console.log(" x !o ");
-			this.__x = y;
+			this.__x = y || '0';
 		}
 		return this.__x;
 	}
@@ -192,10 +196,33 @@ function fourArithmeticOper() {
 		Calculator.setData(result).showData("showval");
 	}
 	Calculator.eraseData();
-	// TODO 由于四则运算后清空了Calculator的数据，导致此时在进行一元运算时无法获取数据
 }
 // =
 function eq() {
 	var result = BinaryOperation.result(Number(Calculator.getDatas()), null);
 	Calculator.setData(result).showData("showval");
+}
+
+var BinaryOperation2 = {
+	__x : null,
+	__y : null,
+	__oper : null,
+	set : function(x, oper) {
+
+		if (!this.__x && !this.__oper) {
+			this.__x = x;
+			this.__oper = oper;
+		}
+
+	}
+};
+function fourArithmeticOper2() {
+	var oper = $(this).text();
+	var inputVal = Number(Calculator.getDatas());
+
+	if (!oper) {
+		BinaryOperation2.__x = inputVal;
+		BinaryOperation2.__oper = oper;
+	}
+
 }
