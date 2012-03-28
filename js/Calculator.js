@@ -61,6 +61,9 @@ function bindClickEventToOperPanlBtns() {
 }
 
 var Calculator = {
+	options : {
+		MAX_INPUT_LEN : 17,// 最大输入长度
+	},
 	__x : [],
 	__oper : null,
 	__data : [],
@@ -118,14 +121,11 @@ var Calculator = {
 	},
 
 	__calculate : function(evals, x, oper, y) {
-		if (evals) {
-			console.log(evals);
-			return String(eval(evals)).split("");
-		} else {
-			var res = eval("(" + x + ")" + oper + "(" + y + ")");
-			console.log("(" + x + ")" + oper + "(" + y + ")", "=" + res);
-			return String(res).split("");
+		if (!evals) {
+			evals = "(" + x + ")" + oper + "(" + y + ")";
 		}
+		console.log(evals, "= " + eval(evals));
+		return String(eval(evals)).split("");
 	},
 	// 一元运算
 	unaryOperation : function(x) {
