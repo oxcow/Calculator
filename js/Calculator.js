@@ -56,30 +56,38 @@ function bindClickEventToNumPanlBtns() {
 // 绑定click事件到操作面板按钮
 function bindClickEventToOperPanlBtns() {
 	bindEventToButton("operPanl", "click", [ oneSubX, sqrtX,
-			fourArithmeticOper, null, fourArithmeticOper, oneDivX,
-			fourArithmeticOper, fourArithmeticOper, eq ]);
+			fourArithmeticOper, fourArithmeticOper, fourArithmeticOper,
+			oneDivX, fourArithmeticOper, fourArithmeticOper, eqs ]);
 }
+
 var Calculator = {
+	__x : [],
+	__oper : null,
 	__data : [],
+	__init__ : function(x, oper, data) {
+		this.__x = x;
+		this.__oper = oper;
+		this.__data = data;
+	},
 	__isDecimalPoint : function(val) { // 判断是否为小数点
 		return val == "." ? true : false;
 	},
 	__dealWithdecimalPoint : function() {
-		if (this.getDataLen() == 0) {
+		if (this.len(this.__data) == 0) {
 			this.__data.push(0);
 		}
 		if (this.__data.toString().indexOf(".") == -1) {
 			this.__data.push(".");
 		}
 	},
-	getDataLen : function() {
-		return this.__data.length;
+	len : function(array) {
+		return $.isArray(array) ? array.length : 0;
 	},
 	pushData : function(val) {// 将输入的数据存放到计算器的数据里
 		if (this.__isDecimalPoint(val)) {
 			this.__dealWithdecimalPoint();
 		} else {
-			if (this.getDataLen() == 1 && this.__data[0] == "0") {
+			if (this.len(this.__data) == 1 && this.__data[0] == "0") {
 				if (val != '0') {
 					this.__data[0] = val;
 				}
@@ -87,142 +95,138 @@ var Calculator = {
 				this.__data.push(val);
 			}
 		}
-		return this;
+		return this.__data;
 	},
 	popData : function() {// 删除计算器的最后一位数据并返回
-		if (this.getDataLen() != 0) {
-			if (this.__data[0] == '-' && this.getDataLen() == 2) {
+		if (this.len(this.__data) != 0) {
+			if (this.__data[0] == '-' && this.len(this.__data) == 2) {
 				this.__data = [];
+			} else if (this.len(this.__data) == 1) {
+				this.__data = [ 0 ];
 			} else {
 				this.__data.pop();
 			}
 		}
-		return this;
+		return this.len(this.__data) != 0 ? this.__data : this.__x;
 	},
 	eraseData : function() {
-		this.__data = [];
-		return this;
+		this.__init__([], null, []);
+		return this.__data;
 	},
-	setData : function(aData) {
-		if ($.isArray(aData)) {
-			this.__data = aData;
+	__getDatas : function(array) {
+		return $.isArray(array) > 0 ? array.join("") : null;
+	},
+
+	__calculate : function(evals, x, oper, y) {
+		if (evals) {
+			console.log(evals);
+			return String(eval(evals)).split("");
 		} else {
-			this.__data = String(aData).split("");
+			var res = eval("(" + x + ")" + oper + "(" + y + ")");
+			console.log("(" + x + ")" + oper + "(" + y + ")", "=" + res);
+			return String(res).split("");
 		}
-		return this;
 	},
-	getDatas : function() {
-		return this.getDataLen() > 0 ? this.__data.join("") : null;
+	// 一元运算
+	unaryOperation : function(x) {
+		var datas = this.__getDatas(this.__data) || this.__getDatas(this.__x);
+		if (datas) {
+			if (x === 0) {
+				this.__data = this.__calculate(null, 0, "-", datas);
+			} else if (x === 1) {
+				// console.log("match--> ", /^[^1-9]+$/.exec(datas));
+				if (/^[^1-9]+$/.test(datas)) {
+					return "除数不能为0";
+				}
+				this.__data = this.__calculate(null, 1, "/", datas);
+			} else {
+				if (/^-/.test(datas)) {
+					return "开平方数不能为负";
+				}
+				this.__data = this.__calculate(null, 0, "+", Math
+						.sqrt(Number(datas)));
+			}
+		}
+		return this.__data;
 	},
-	showData : function(positionId) {
-		$("#" + positionId).val(this.getDatas() || '0');
+	// 二元运算
+	binaryOperation : function(oper) {
+		if (this.len(this.__data) != 0) {
+			if (this.len(this.__x) == 0) {
+				this.__x = this.__data;
+			} else {
+				if (/^%$/.test(oper)) {
+					this.__x = this.__calculate("(" + this.__getDatas(this.__x)
+							+ ") * (" + this.__getDatas(this.__data)
+							+ ") / 100");
+					oper = null;
+				} else {
+					if (/^\/$/.test(this.__oper)
+							&& /^[^1-9]+$/.test(this.__getDatas(this.__data))) {
+						return "除数不能为0";
+					}
+					this.__x = this.__calculate(null,
+							this.__getDatas(this.__x), this.__oper, this
+									.__getDatas(this.__data));
+				}
+			}
+			this.__data = [];
+		}
+		this.__oper = oper;
+		return this.__x;
+	},
+	// 等号操作
+	eqs : function() {
+		if (this.len(this.__data) != 0 && this.len(this.__x) != 0
+				&& this.__oper) {
+			if (/\//.test(this.__oper)
+					&& /^[^1-9]+$/.test(this.__getDatas(this.__data))) {
+				return "除数不能为0";
+			}
+			this.__init__([], null, this.__calculate(null, this
+					.__getDatas(this.__x), this.__oper, this
+					.__getDatas(this.__data)));
+		}
+		return this.len(this.__data) != 0 ? this.__data : this.__x;
+	},
+	show : function(array, divId) {
+		if ($.isArray(array)) {
+			$("#" + divId).val(array.join("") || '0');
+		} else {
+			$("#" + divId).val(array);
+		}
 	}
 };
 
 // ctrlPanl-回退输入事件
 function rollBackInput() {
-	Calculator.popData().showData("showval");
+	Calculator.show(Calculator.popData(), "showval");
 }
 // ctrlPanl-清空输入事件
 function clearInput() {
-	Calculator.eraseData().showData("showval");
-	BinaryOperation.init(0, null);
+	Calculator.show(Calculator.eraseData(), "showval");
 }
 // numPanl-输入事件
 function inputNum() {
-	Calculator.pushData($(this).text()).showData("showval");
-}
-// 0-x
-function oneSubX() {
-	var val = Number(Calculator.getDatas());
-	Calculator.setData(0 - val).showData("showval");
+	Calculator.show(Calculator.pushData($(this).text()), "showval");
 }
 // sqrt(x)
 function sqrtX() {
-	var val = Number(Calculator.getDatas());
-	if (val < 0) {
-		console.log("Math.sqrt(" + val + ")输入非法");
-		return false;
-	} else {
-		Calculator.setData(Math.sqrt(val)).showData("showval");
-	}
+	Calculator.show(Calculator.unaryOperation(), "showval");
+}
+// 0-x
+function oneSubX() {
+	Calculator.show(Calculator.unaryOperation(0), "showval");
 }
 // 1/x
 function oneDivX() {
-	var val = Number(Calculator.getDatas());
-	if (val == 0) {
-		console.log("0 不能做除数");
-		return false;
-	} else {
-		Calculator.setData(1 / val).showData("showval");
-	}
+	Calculator.show(Calculator.unaryOperation(1), "showval");
 }
-
-var BinaryOperation = {
-	__x : 0,
-	__oper : null,
-	init : function(x, oper) {
-		this.__x = x;
-		this.__oper = oper;
-	},
-	getOper : function() {
-		return this.__oper;
-	},
-	result : function(y, oper) {
-		if (this.__oper) {
-			if (y) {
-				var res = eval("(" + this.__x + ")" + this.__oper + "(" + y
-						+ ")");
-				console.log("(" + this.__x + ")" + this.__oper + "(" + y + ")",
-						"=" + res);
-				this.__x = res;
-			}
-			this.__oper = oper;
-		} else {
-			this.__x = y || '0';
-		}
-		return this.__x;
-	}
-};
-
 // x+y x-y x*y x/y Four Arithmetic Operations
 function fourArithmeticOper() {
-	var oper = $(this).text();
-	var inputVal = Number(Calculator.getDatas());
-	if (!BinaryOperation.getOper()) {
-		BinaryOperation.init(inputVal, oper);
-	} else {
-		var result = BinaryOperation.result(inputVal, oper);
-		Calculator.setData(result).showData("showval");
-	}
-	Calculator.eraseData();
+	Calculator.show(Calculator.binaryOperation($(this).text()), "showval");
 }
 // =
-function eq() {
-	var result = BinaryOperation.result(Number(Calculator.getDatas()), null);
-	Calculator.setData(result).showData("showval");
-}
-
-var BinaryOperation2 = {
-	__x : null,
-	__y : null,
-	__oper : null,
-	set : function(x, oper) {
-
-		if (!this.__x && !this.__oper) {
-			this.__x = x;
-			this.__oper = oper;
-		}
-
-	}
-};
-function fourArithmeticOper2() {
-	var oper = $(this).text();
-	var inputVal = Number(Calculator.getDatas());
-
-	if (!oper) {
-		BinaryOperation2.__x = inputVal;
-		BinaryOperation2.__oper = oper;
-	}
-
+function eqs() {
+	Calculator.show(Calculator.eqs(), "showval");
 }
