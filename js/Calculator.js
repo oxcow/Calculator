@@ -100,9 +100,6 @@ var Calculator = {
 		}
 		return this.__data;
 	},
-	confiletest:function(){
-		console.log("conficlt test");
-	},
 	popData : function() {// 删除计算器的最后一位数据并返回
 		if (this.__data.length != 0) {
 			if (this.__data[0] == '-' && this.__data.length == 2
