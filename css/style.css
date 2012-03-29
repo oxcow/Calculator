@@ -6,45 +6,45 @@
 }
 
 .showPanl {
-	width: 188px;
 	float: left;
-	border: green solid 2px;
+	width: 196px;
+	border: 2px solid tan;
 }
 
 .leftPanl {
-	border: tan solid 2px;
+	float: left;
+	width: 118px;
+	border: 2px solid tan;
 	border-right-width: 0px;
 	border-top-width: 0px;
-	width: 113px;
-	float: left;
 }
 
 .ctrlPanl,.numPanl {
-	margin-left: 3px;
+	margin-left: 4px;
 }
 
 .operPanl {
-	width: 75px;
 	float: left;
-	border: tan solid 2px;
+	width: 78px;
+	border:  2px solid tan;
 	border-left-width: 0px;
 	border-top-width: 0px;
 }
 
 .showPanl input {
-	padding: 0px 1px 0px 1px;
-	width: 183px;
+	padding: 0px 1px 0px 2px;
+	width: 190px;
 	height: 40px;
 	font-size: 20px;
 	text-align: right;
 }
 
 #numPanlc_btn_10,#operPanlc_btn_8 {
-	width: 72px;
+	width: 73px;
 }
 
 button {
-	margin: 1px 2px 1px 0px;
+	margin: 1px 2px 1px 1px;
 	padding: 1px 1px 1px 1px;
 	float: left;
 	width: 35px;
