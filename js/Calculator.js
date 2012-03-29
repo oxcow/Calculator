@@ -59,7 +59,11 @@ function bindClickEventToOperPanlBtns() {
 			fourArithmeticOper, fourArithmeticOper, fourArithmeticOper,
 			oneDivX, fourArithmeticOper, fourArithmeticOper, eqs ]);
 }
-
+var CalculatorUtils = {
+	ArrayToString : function(array, split) {
+		return $.isArray(array) ? array.join(split || "") : null;
+	}
+};
 var Calculator = {
 	options : {
 		MAX_INPUT_LEN : 17,// 最大输入长度
@@ -72,55 +76,46 @@ var Calculator = {
 		this.__oper = oper;
 		this.__data = data;
 	},
-	__isDecimalPoint : function(val) { // 判断是否为小数点
-		return val == "." ? true : false;
-	},
 	__dealWithdecimalPoint : function() {
-		if (this.len(this.__data) == 0) {
+		if (this.__data.length == 0) {
 			this.__data.push(0);
 		}
 		if (this.__data.toString().indexOf(".") == -1) {
 			this.__data.push(".");
 		}
 	},
-	len : function(array) {
-		return $.isArray(array) ? array.length : 0;
-	},
 	pushData : function(val) {// 将输入的数据存放到计算器的数据里
-		if (this.__isDecimalPoint(val)) {
-			this.__dealWithdecimalPoint();
-		} else {
-			if (this.len(this.__data) == 1 && this.__data[0] == "0") {
-				if (val != '0') {
-					this.__data[0] = val;
-				}
+		if (this.__data.length != this.options.MAX_INPUT_LEN) {
+			if (/^\.$/.test(val)) {
+				this.__dealWithdecimalPoint();
 			} else {
-				this.__data.push(val);
+				if (this.__data.length == 1 && this.__data[0] == "0") {
+					if (val != '0') {
+						this.__data[0] = val;
+					}
+				} else {
+					this.__data.push(val);
+				}
 			}
 		}
 		return this.__data;
 	},
 	popData : function() {// 删除计算器的最后一位数据并返回
-		if (this.len(this.__data) != 0) {
-			if (this.__data[0] == '-' && this.len(this.__data) == 2) {
-				this.__data = [];
-			} else if (this.len(this.__data) == 1) {
+		if (this.__data.length != 0) {
+			if (this.__data[0] == '-' && this.__data.length == 2
+					|| this.__data.length == 1) {
 				this.__data = [ 0 ];
 			} else {
 				this.__data.pop();
 			}
 		}
-		return this.len(this.__data) != 0 ? this.__data : this.__x;
+		return this.__data.length != 0 ? this.__data : this.__x;
 	},
 	eraseData : function() {
-		this.__init__([], null, []);
+		this.__init__([], null, [ 0 ]);
 		return this.__data;
 	},
-	__getDatas : function(array) {
-		return $.isArray(array) > 0 ? array.join("") : null;
-	},
-
-	__calculate : function(evals, x, oper, y) {
+	calculate : function(evals, x, oper, y) {
 		if (!evals) {
 			evals = "(" + x + ")" + oper + "(" + y + ")";
 		}
@@ -129,21 +124,21 @@ var Calculator = {
 	},
 	// 一元运算
 	unaryOperation : function(x) {
-		var datas = this.__getDatas(this.__data) || this.__getDatas(this.__x);
+		var datas = CalculatorUtils.ArrayToString(this.__data)
+				|| CalculatorUtils.ArrayToString(this.__x);
 		if (datas) {
 			if (x === 0) {
-				this.__data = this.__calculate(null, 0, "-", datas);
+				this.__data = this.calculate(null, 0, "-", datas);
 			} else if (x === 1) {
-				// console.log("match--> ", /^[^1-9]+$/.exec(datas));
 				if (/^[^1-9]+$/.test(datas)) {
 					return "除数不能为0";
 				}
-				this.__data = this.__calculate(null, 1, "/", datas);
+				this.__data = this.calculate(null, 1, "/", datas);
 			} else {
 				if (/^-/.test(datas)) {
 					return "开平方数不能为负";
 				}
-				this.__data = this.__calculate(null, 0, "+", Math
+				this.__data = this.calculate(null, 0, "+", Math
 						.sqrt(Number(datas)));
 			}
 		}
@@ -151,23 +146,22 @@ var Calculator = {
 	},
 	// 二元运算
 	binaryOperation : function(oper) {
-		if (this.len(this.__data) != 0) {
-			if (this.len(this.__x) == 0) {
+		if (this.__data.length != 0) {
+			if (this.__x.length == 0) {
 				this.__x = this.__data;
 			} else {
 				if (/^%$/.test(oper)) {
-					this.__x = this.__calculate("(" + this.__getDatas(this.__x)
-							+ ") * (" + this.__getDatas(this.__data)
+					this.__x = this.calculate("("
+							+ CalculatorUtils.ArrayToString(this.__x) + ") * ("
+							+ CalculatorUtils.ArrayToString(this.__data)
 							+ ") / 100");
 					oper = null;
+				} else if (this.__isZeroForDivisor) {
+					return "除数不能为0";
 				} else {
-					if (/^\/$/.test(this.__oper)
-							&& /^[^1-9]+$/.test(this.__getDatas(this.__data))) {
-						return "除数不能为0";
-					}
-					this.__x = this.__calculate(null,
-							this.__getDatas(this.__x), this.__oper, this
-									.__getDatas(this.__data));
+					this.__x = this.calculate(null, CalculatorUtils
+							.ArrayToString(this.__x), this.__oper,
+							CalculatorUtils.ArrayToString(this.__data));
 				}
 			}
 			this.__data = [];
@@ -177,24 +171,22 @@ var Calculator = {
 	},
 	// 等号操作
 	eqs : function() {
-		if (this.len(this.__data) != 0 && this.len(this.__x) != 0
-				&& this.__oper) {
-			if (/\//.test(this.__oper)
-					&& /^[^1-9]+$/.test(this.__getDatas(this.__data))) {
+		if (this.__data.length != 0 && this.__x.length != 0 && this.__oper) {
+			if (/^\/$/.test(this.__oper)
+					&& /^[^1-9]+$/.test(CalculatorUtils
+							.ArrayToString(this.__data))) {
 				return "除数不能为0";
 			}
-			this.__init__([], null, this.__calculate(null, this
-					.__getDatas(this.__x), this.__oper, this
-					.__getDatas(this.__data)));
+			this.__init__([], null, this.calculate(null, CalculatorUtils
+					.ArrayToString(this.__x), this.__oper, CalculatorUtils
+					.ArrayToString(this.__data)));
 		}
-		return this.len(this.__data) != 0 ? this.__data : this.__x;
+		return this.__data.length != 0 ? this.__data : this.__x;
 	},
 	show : function(array, divId) {
-		if ($.isArray(array)) {
-			$("#" + divId).val(array.join("") || '0');
-		} else {
-			$("#" + divId).val(array);
-		}
+		$("#" + divId).val(
+				/^[-.\d]{1,17}/.exec(CalculatorUtils.ArrayToString(array))
+						|| array);
 	}
 };
 
