@@ -11,7 +11,8 @@
     padding: 2px 2px;
     width: 222px;
     height: 40px;
-    border: antiquewhite solid 1px;
+    border: aquamarine solid 1px;
+    background-color: bisque;
 }
 
 .clickBar {

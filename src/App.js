@@ -1,9 +1,9 @@
 import React from 'react';
-import Calculator from "./components/Calculator";
+import CalculatorBoard from "./components/CalculatorBoard";
 
 function App() {
     return (
-        <Calculator/>
+        <CalculatorBoard/>
     );
 }
 
