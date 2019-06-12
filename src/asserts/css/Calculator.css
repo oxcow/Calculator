@@ -1,0 +1,48 @@
+.calculator {
+    padding: 2px 2px;
+    width: 230px;
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #61dafb;
+}
+
+.displayBar {
+    margin: 2px;
+    padding: 2px 2px;
+    width: 222px;
+    height: 40px;
+    border: antiquewhite solid 1px;
+}
+
+.clickBar {
+    width: 229px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.basicCalculator {
+    width: 168px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.basicBar {
+    height: 34px;
+}
+
+.operateBar {
+    width: 54px;
+}
+
+button {
+    margin: 2px 2px;
+    width: 50px;
+    height: 30px;
+    border: #61dafb solid 1px;
+}
+
+.zeroButton {
+    width: 104px;
+}
