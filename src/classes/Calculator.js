@@ -1,73 +1,81 @@
+;
+
+const getNumberFromArray = Symbol('getNumberFromArray');
+const getArrayFromNumber = Symbol('getArrayFromNumber')
+
 export default class Calculator {
+
     constructor() {
-        this.param1 = 0;
-        this.param2 = null;
-        this.operator = null;
-        this.calResult = 0;
+        this.param1 = [];
+        this.param2 = [];
+        this.operator = null
+    }
+
+    [getNumberFromArray](array) {
+        return Number(array.join(''));
+    }
+
+    [getArrayFromNumber](number) {
+        return String(number).split('');
     }
 
     setParam1 = (val) => {
-        this.param1 = val;
+        this.param1.push(val);
     }
 
     setParam2 = (val) => {
-        this.param2 = val;
+        this.param2.push(val);
     }
 
     setOperator = (operator) => {
         if (this.operator != null) {
-            this.param1 = this.calculate();
+            this.calculate();
         }
         this.operator = operator;
     }
 
+    getParam1 = () => {
+        return this[getNumberFromArray](this.param1);
+    }
+
+    getParam2 = () => {
+        return this[getNumberFromArray](this.param2);
+    }
+
+    getOperator = () => {
+        return this.operator;
+    }
+
     getStates = () => {
-        return [this.param1, this.param2, this.operator];
-    }
-
-    add = () => {
-        this.calResult = this.param1 + this.param2;
-        // [this.param1, this.param2] = [this.calResult, null];
-    }
-
-    sub = () => {
-        this.calResult = this.param1 - this.param2;
-        // [this.param1, this.param2] = [this.calResult, null];
-    }
-
-    multi = () => {
-        this.calResult = this.param1 * this.param2;
-        // [this.param1, this.param2] = [this.calResult, null];
-    }
-
-    div = () => {
-        this.calResult = this.param1 / this.param2;
-        // [this.param1, this.param2] = [this.calResult, null];
+        return [this.getParam1(), this.getParam2(), this.getOperator()];
     }
 
     calculate = () => {
-        // TODO: 单目运算
-        // 二目运算
-        if (this.param2 === null) return this.param1;
 
+        if (this.param2.length === 0) return this[getNumberFromArray](this.param1);
+
+        const [v1, v2] = [this[getNumberFromArray](this.param1), this[getNumberFromArray](this.param2)];
+        let calResult = 0;
         switch (this.operator) {
             case '/':
-                this.div();
+                calResult = v1 / v2;
                 break;
             case '*':
-                this.multi();
+                calResult = v1 * v2;
                 break;
             case '+':
-                this.add();
+                calResult = v1 + v2;
                 break;
             case '-':
-                this.sub();
+                calResult = v1 - v2;
                 break;
             default:
                 console.warn('Operator is null!');
-                return this.param1;
+                return this[getNumberFromArray](this.param1);
         }
-        [this.param1, this.param2] = [this.calResult, null];
-        return this.calResult;
+
+        [this.param1, this.param2] = [this[getArrayFromNumber](calResult), []];
+
+        return calResult;
     }
 }

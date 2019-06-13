@@ -24,9 +24,6 @@
 
 .basicCalculator {
     width: 168px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
 }
 
 .basicBar {

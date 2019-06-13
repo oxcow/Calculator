@@ -17,23 +17,22 @@ class CalculatorBoard extends Component {
     }
 
     inputNumberHandler = (e) => {
-        // TODO: Decimal point
-        const inputValue = Number(e.currentTarget.innerHTML);
-        const [param1, param2, operator] = this.calculator.getStates();
+        const inputValue = e.currentTarget.innerHTML;
+        const operator = this.calculator.getOperator();
         let displayValue = 0;
         if (operator) {
-            displayValue = param2 * 10 + inputValue;
-            this.calculator.setParam2(displayValue);
+            this.calculator.setParam2(inputValue);
+            displayValue = this.calculator.getParam2();
         } else {
-            displayValue = param1 * 10 + inputValue;
-            this.calculator.setParam1(displayValue);
+            this.calculator.setParam1(inputValue);
+            displayValue = this.calculator.getParam1();
         }
         this.setState({calResult: displayValue});
     }
 
     inputOperatorHandler = (e) => {
         this.calculator.setOperator(e.currentTarget.innerHTML);
-        this.calculateHandler()
+        this.calculateHandler();
     }
 
     calculateHandler = () => {
@@ -58,12 +57,14 @@ class CalculatorBoard extends Component {
                         <div className='numberBar'>
                             {
                                 [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, '.'].map(number => {
-                                    return (<span key={number}>
-                                        <button className={number === 0 ? 'zeroButton' : ''}
-                                                onClick={this.inputNumberHandler}>
-                                            {number}
-                                        </button>
-                                    </span>)
+                                    return (
+                                        <span key={number}>
+                                            <button className={number === 0 ? 'zeroButton' : ''}
+                                                    onClick={this.inputNumberHandler}>
+                                                {number}
+                                            </button>
+                                        </span>
+                                    )
                                 })
                             }
                         </div>
@@ -86,4 +87,4 @@ class CalculatorBoard extends Component {
     }
 }
 
-export default CalculatorBoard
+export default CalculatorBoard;
