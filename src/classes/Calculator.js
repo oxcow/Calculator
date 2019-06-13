@@ -6,7 +6,7 @@ const getArrayFromNumber = Symbol('getArrayFromNumber')
 export default class Calculator {
 
     constructor() {
-        this.param1 = [];
+        this.param1 = [0];
         this.param2 = [];
         this.operator = null
     }
@@ -16,7 +16,7 @@ export default class Calculator {
     }
 
     [getArrayFromNumber](number) {
-        return String(number).split('');
+        return [...String(number)];
     }
 
     setParam1 = (val) => {
@@ -24,6 +24,9 @@ export default class Calculator {
     }
 
     setParam2 = (val) => {
+        if (this.param2.length === 0) {
+            this.param2.push(0);
+        }
         this.param2.push(val);
     }
 
@@ -34,11 +37,11 @@ export default class Calculator {
         this.operator = operator;
     }
 
-    getParam1 = () => {
+    getParam1Value = () => {
         return this[getNumberFromArray](this.param1);
     }
 
-    getParam2 = () => {
+    getParam2Value = () => {
         return this[getNumberFromArray](this.param2);
     }
 
@@ -47,7 +50,7 @@ export default class Calculator {
     }
 
     getStates = () => {
-        return [this.getParam1(), this.getParam2(), this.getOperator()];
+        return [this.getParam1Value(), this.getParam2Value(), this.getOperator()];
     }
 
     calculate = () => {

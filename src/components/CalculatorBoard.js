@@ -12,7 +12,6 @@ class CalculatorBoard extends Component {
     }
 
     componentDidMount() {
-        // console.log("did mount");
         this.calculator = new Calculator();
     }
 
@@ -22,10 +21,13 @@ class CalculatorBoard extends Component {
         let displayValue = 0;
         if (operator) {
             this.calculator.setParam2(inputValue);
-            displayValue = this.calculator.getParam2();
+            displayValue = this.calculator.getParam2Value();
         } else {
             this.calculator.setParam1(inputValue);
-            displayValue = this.calculator.getParam1();
+            displayValue = this.calculator.getParam1Value();
+        }
+        if (inputValue === '.') {
+            displayValue += '.';
         }
         this.setState({calResult: displayValue});
     }
