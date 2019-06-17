@@ -15,6 +15,16 @@ class CalculatorBoard extends Component {
         this.calculator = new Calculator();
     }
 
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        this.calculator.getStates();
+        return true;
+    }
+
+    resetHandler = () => {
+        this.calculator.reset();
+        this.setState({calResult: 0});
+    }
+
     inputNumberHandler = (e) => {
         const inputValue = e.currentTarget.innerHTML;
         const operator = this.calculator.getOperator();
@@ -37,6 +47,14 @@ class CalculatorBoard extends Component {
         this.calculateHandler();
     }
 
+    inputNegativeHandler = () => {
+        this.setState({calResult: this.calculator.negative()});
+    }
+
+    inputPercentage = () => {
+        this.setState({calResult: this.calculator.percentage()});
+    }
+
     calculateHandler = () => {
         this.setState({
             calResult: this.calculator.calculate()
@@ -52,9 +70,9 @@ class CalculatorBoard extends Component {
                 <div className='clickBar'>
                     <div className='basicCalculator'>
                         <div className='basicBar'>
-                            <span><button>A/C</button></span>
-                            <span><button>+/-</button></span>
-                            <span><button>%</button></span>
+                            <span><button onClick={this.resetHandler}>A/C</button></span>
+                            <span><button onClick={this.inputNegativeHandler}>+/-</button></span>
+                            <span><button onClick={this.inputPercentage}>%</button></span>
                         </div>
                         <div className='numberBar'>
                             {

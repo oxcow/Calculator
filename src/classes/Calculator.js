@@ -50,7 +50,45 @@ export default class Calculator {
     }
 
     getStates = () => {
+        console.log(JSON.stringify(this));
         return [this.getParam1Value(), this.getParam2Value(), this.getOperator()];
+    }
+
+    reset = () => {
+        this.param1 = [0];
+        this.param2 = [];
+        this.operator = null
+    }
+
+    negative = () => {
+        if (this.operator) {
+            if (this.param2[0] !== '-') {
+                this.param2 = this.param2.slice(1);
+            } else {
+                this.param2 = ['-', ...this.param2];
+            }
+            return this.getParam2Value();
+        } else {
+            if (this.param1[0] === '-') {
+                this.param1 = this.param1.slice(1);
+            } else {
+                this.param1 = ['-', ...this.param1];
+            }
+            return this.getParam1Value();
+        }
+    }
+
+    percentage = () => {
+        let percent = null;
+        if (this.operator) {
+            percent = this[getNumberFromArray](this.param2) / 100;
+            this.param2 = this[getArrayFromNumber](percent);
+            return percent;
+        } else {
+            percent = this[getNumberFromArray](this.param1) / 100;
+            this.param1 = this[getArrayFromNumber](percent)
+        }
+        return percent;
     }
 
     calculate = () => {
@@ -60,16 +98,16 @@ export default class Calculator {
         const [v1, v2] = [this[getNumberFromArray](this.param1), this[getNumberFromArray](this.param2)];
         let calResult = 0;
         switch (this.operator) {
-            case '/':
+            case '/': // divide
                 calResult = v1 / v2;
                 break;
-            case '*':
+            case '*': // multiply
                 calResult = v1 * v2;
                 break;
-            case '+':
+            case '+': // plus
                 calResult = v1 + v2;
                 break;
-            case '-':
+            case '-': // subtract
                 calResult = v1 - v2;
                 break;
             default:
@@ -77,7 +115,7 @@ export default class Calculator {
                 return this[getNumberFromArray](this.param1);
         }
 
-        [this.param1, this.param2] = [this[getArrayFromNumber](calResult), []];
+        [this.param1, this.param2, this.operator] = [this[getArrayFromNumber](calResult), [], null];
 
         return calResult;
     }
