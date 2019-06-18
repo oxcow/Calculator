@@ -1,14 +1,14 @@
 ;
 
 const getNumberFromArray = Symbol('getNumberFromArray');
-const getArrayFromNumber = Symbol('getArrayFromNumber')
+const getArrayFromNumber = Symbol('getArrayFromNumber');
 
 export default class Calculator {
 
     constructor() {
         this.param1 = [0];
         this.param2 = [];
-        this.operator = null
+        this.operator = null;
     }
 
     [getNumberFromArray](array) {
@@ -57,7 +57,7 @@ export default class Calculator {
     reset = () => {
         this.param1 = [0];
         this.param2 = [];
-        this.operator = null
+        this.operator = null;
     }
 
     negative = () => {
