@@ -26,25 +26,13 @@ class CalculatorBoard extends Component {
     }
 
     inputNumberHandler = (e) => {
-        const inputValue = e.currentTarget.innerHTML;
-        const operator = this.calculator.getOperator();
-        let displayValue = 0;
-        if (operator) {
-            this.calculator.setParam2(inputValue);
-            displayValue = this.calculator.getParam2Value();
-        } else {
-            this.calculator.setParam1(inputValue);
-            displayValue = this.calculator.getParam1Value();
-        }
-        if (inputValue === '.') {
-            displayValue += '.';
-        }
-        this.setState({calResult: displayValue});
+        this.calculator.inputNumber(e.currentTarget.innerHTML);
+        this.setState({calResult: this.calculator.getDisplay()});
     }
 
     inputOperatorHandler = (e) => {
-        this.calculator.setOperator(e.currentTarget.innerHTML);
-        this.calculateHandler();
+        this.calculator.inputOperator(e.currentTarget.innerHTML);
+        this.setState({calResult: this.calculator.getDisplay()});
     }
 
     inputNegativeHandler = () => {

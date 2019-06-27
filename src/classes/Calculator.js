@@ -1,4 +1,4 @@
-;
+import Arithmetic from './Arithmetic';
 
 const getNumberFromArray = Symbol('getNumberFromArray');
 const getArrayFromNumber = Symbol('getArrayFromNumber');
@@ -6,9 +6,12 @@ const getArrayFromNumber = Symbol('getArrayFromNumber');
 export default class Calculator {
 
     constructor() {
+        this.expressionStatic = [];
+        this.number = [];
         this.param1 = [0];
         this.param2 = [];
         this.operator = null;
+        this.inputValue = [];
     }
 
     [getNumberFromArray](array) {
@@ -17,6 +20,26 @@ export default class Calculator {
 
     [getArrayFromNumber](number) {
         return [...String(number)];
+    }
+
+    inputNumber = (val) => {
+        this.inputValue.push(val);
+    }
+
+    getDisplay = () => {
+        return [...this.expressionStatic, ...this.inputValue].join('');
+
+    }
+
+    inputOperator = (val) => {
+        this.expressionStatic.push(this.inputValue.join(''));
+        this.expressionStatic.push(val);
+        this.inputValue = [];
+    }
+
+    setInputValue = (val) => {
+        this.inputValue.push(val);
+        return this.inputValue.join('');
     }
 
     setParam1 = (val) => {
@@ -92,31 +115,10 @@ export default class Calculator {
     }
 
     calculate = () => {
-
-        if (this.param2.length === 0) return this[getNumberFromArray](this.param1);
-
-        const [v1, v2] = [this[getNumberFromArray](this.param1), this[getNumberFromArray](this.param2)];
-        let calResult = 0;
-        switch (this.operator) {
-            case '/': // divide
-                calResult = v1 / v2;
-                break;
-            case '*': // multiply
-                calResult = v1 * v2;
-                break;
-            case '+': // plus
-                calResult = v1 + v2;
-                break;
-            case '-': // subtract
-                calResult = v1 - v2;
-                break;
-            default:
-                console.warn('Operator is null!');
-                return this[getNumberFromArray](this.param1);
-        }
-
-        [this.param1, this.param2, this.operator] = [this[getArrayFromNumber](calResult), [], null];
-
-        return calResult;
+        const arithmetic = new Arithmetic([...this.expressionStatic, this.inputValue.join('')]);
+        const result = arithmetic.calculate();
+        this.expressionStatic = [];
+        this.inputValue = [result];
+        return result;
     }
 }
