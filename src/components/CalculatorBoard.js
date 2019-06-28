@@ -36,11 +36,13 @@ class CalculatorBoard extends Component {
     }
 
     inputNegativeHandler = () => {
-        this.setState({calResult: this.calculator.negative()});
+        this.calculator.negative();
+        this.setState({calResult: this.calculator.getDisplay()});
     }
 
     inputPercentage = () => {
-        this.setState({calResult: this.calculator.percentage()});
+        this.calculator.percentage();
+        this.setState({calResult: this.calculator.getDisplay()});
     }
 
     calculateHandler = () => {
